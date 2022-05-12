@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,5 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
-Route::get('/accounts', function () {
-    return view('accounts');
-});
+Route::get('/accounts', [AccountsController::class, "index"]);
+Route::post("/accounts", [AccountsController::class, "create"]);

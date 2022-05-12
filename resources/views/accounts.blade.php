@@ -38,10 +38,19 @@
                 { field: "phone", title: "Teléfono" },
                 { field: "account_type", title: "Tipo de cuenta" }
             ],
-            toolbar: ["create", "edit"],
+            toolbar: [{name: "Create", text: "Crear", iconClass: "k-icon k-i-plus-outline"}, {name:"edit"}],
             sortable: true,
             filterable: true
         });
+
+        $(".k-grid-Create").on("click", (e) => {
+            e.preventDefault();
+            $.ajax({
+                url: "/accounts",
+                data: {_token: "{{ csrf_token() }}"},
+                type: "POST",
+            });
+        })
     });
 </script>
 @endsection
