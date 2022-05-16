@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Services\WhatsappWrapper;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\TimeoutException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -14,13 +16,16 @@ class TestWrapper extends TestCase
      *
      * @return void
      */
-    public function test_example()
+    public function test_example(): void
     {
         $wrapper = new WhatsappWrapper();
         $wrapper->start();
-        $qr_decoded = $wrapper->get_qr_login();
-        
-
+        try {
+            $qr_decoded = $wrapper->get_qr_login();
+            $wrapper->wait_until_logged();
+        } catch (NoSuchElementException|TimeoutException $e) {
+            $this->fail();
+        }
         $this->assertTrue(true);
     }
 }

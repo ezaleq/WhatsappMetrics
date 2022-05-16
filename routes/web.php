@@ -18,5 +18,9 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
-Route::get('/accounts', [AccountsController::class, "index"]);
-Route::post("/accounts", [AccountsController::class, "create"]);
+Route::get('/accounts', function () {
+    return view("accounts.index");
+});
+Route::get("/accounts/create", function() {
+    return view("accounts.create");
+});

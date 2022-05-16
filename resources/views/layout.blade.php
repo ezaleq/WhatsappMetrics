@@ -24,7 +24,7 @@
             <i class="bi bi-speedometer"></i>
             Tablero
         </x-navbar_item>
-        <x-navbar_item href="accounts">
+        <x-navbar_item href="/accounts">
             <i class="bi bi-whatsapp"></i>
             Cuentas
         </x-navbar_item>

@@ -16,8 +16,6 @@ class AccountsController extends Controller
 
     public function create(): bool
     {
-        $wrapper = new WhatsappWrapper();
-        $wrapper->start();
-        return true;
+        return View
     }
 }
