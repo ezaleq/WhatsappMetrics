@@ -16,16 +16,38 @@ class TestWrapper extends TestCase
      *
      * @return void
      */
-    public function test_example(): void
+
+    public function create() : string
+    {
+        $wrapper = new WhatsappWrapper();
+        $session_id = $wrapper->start();
+        $wrapper->go_to("https://web.whatsapp.com/");
+        return $session_id;
+    }
+
+    /**
+     * @throws NoSuchElementException
+     * @throws TimeoutException
+     */
+//    public function test_sessions(): void
+//    {
+//        $session_id = $this->create();
+//        $wrapper = new WhatsappWrapper($session_id);
+//        $wrapper->start();
+//        $data = $wrapper->get_qr_login();
+//        $this->assertTrue(isset($data));
+//    }
+
+    public function test_getting_session(): void
     {
         $wrapper = new WhatsappWrapper();
         $wrapper->start();
-        try {
-            $qr_decoded = $wrapper->get_qr_login();
-            $wrapper->isLogged();
-        } catch (NoSuchElementException|TimeoutException $e) {
-            $this->fail();
+        $wrapper->go_to("https://web.whatsapp.com/");
+        while(!$wrapper->isLogged())
+        {
+            continue;
         }
-        $this->assertTrue(true);
+        $session = $wrapper->getSession();
+        self::assertNotEmpty($session);
     }
 }

@@ -31,7 +31,7 @@
             $.ajax({
                 type: "GET",
                 url: "/api/accounts/qr",
-                success: (imageData) => {
+                success: (data) => {
                     $("div#loading").hide();
                     $("div#loaded").show();
                     const qrElement = $("canvas#qr").get(0);
@@ -40,8 +40,8 @@
                     image.onload = () => {
                         ctx.drawImage(image, 0, 0);
                     }
-                    image.src= "data:image/png;base64" + imageData;
-                    checkIfSign();
+                    image.src= "data:image/png;base64" + data.image;
+                    checkIfSign(data.sessionId);
                 },
                 error: (data) => {
                     console.log(data);
@@ -50,11 +50,12 @@
             })
         }
 
-        async function checkIfSign() {
+        async function checkIfSign(sessionId) {
             while (true) {
                 try {
-                    const response = await $.ajax({
+                    await $.ajax({
                         type: "GET",
+                        data: {sessionId},
                         url: "/api/accounts/isLogged"
                     });
                     break;

@@ -19,7 +19,6 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal()) {
             $this->app->register(IdeHelperServiceProvider::class);
         }
-        view()->share("wrapper", new WhatsappWrapper());
 
     }
 
