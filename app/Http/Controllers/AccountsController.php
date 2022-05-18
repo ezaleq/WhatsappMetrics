@@ -2,20 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AccountsService;
 use App\Services\WhatsappWrapper;
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Log;
+use Exception;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\TimeoutException;
+use Illuminate\Http\Request;
+use JetBrains\PhpStorm\ArrayShape;
 
 
 class AccountsController extends Controller
 {
-    public function index(): View
+    /**
+     * @throws NoSuchElementException
+     * @throws TimeoutException
+     * @throws Exception
+     */
+    public function getQr(Request $request): string
     {
-        return View("accounts");
+        $wrapper = new WhatsappWrapper();
+        $wrapper->start();
+        $qrImage = $wrapper->get_qr_login();
+        $request->session()->put("wrapper", $wrapper);
+        return $qrImage;
     }
 
-    public function create(): bool
+    /**
+     * @throws Exception
+     */
+    public function isLogged(Request $request): bool
     {
-        return View
+        $wrapper = $request->session()->get("wrapper");
+        if ($wrapper->isLogged())
+        {
+            return true;
+        }
+        throw new Exception();
     }
+
 }

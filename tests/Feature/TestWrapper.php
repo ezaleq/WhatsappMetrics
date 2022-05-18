@@ -22,7 +22,7 @@ class TestWrapper extends TestCase
         $wrapper->start();
         try {
             $qr_decoded = $wrapper->get_qr_login();
-            $wrapper->wait_until_logged();
+            $wrapper->isLogged();
         } catch (NoSuchElementException|TimeoutException $e) {
             $this->fail();
         }

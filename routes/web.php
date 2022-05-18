@@ -24,3 +24,7 @@ Route::get('/accounts', function () {
 Route::get("/accounts/create", function() {
     return view("accounts.create");
 });
+
+
+Route::get("/api/accounts/qr", [AccountsController::class, "getQr"]);
+Route::get("/api/accounts/isLogged", [AccountsController::class, "isLogged"]);

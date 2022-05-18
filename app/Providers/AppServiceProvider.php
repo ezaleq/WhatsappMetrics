@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\AccountsService;
+use App\Services\WhatsappWrapper;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,7 +19,8 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal()) {
             $this->app->register(IdeHelperServiceProvider::class);
         }
-        //
+        view()->share("wrapper", new WhatsappWrapper());
+
     }
 
     /**
