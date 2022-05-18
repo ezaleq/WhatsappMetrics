@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\WPPSession;
 use App\Services\WhatsappWrapper;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeoutException;
@@ -47,7 +48,19 @@ class TestWrapper extends TestCase
         {
             continue;
         }
-        $session = $wrapper->getSession();
-        self::assertNotEmpty($session);
+        $username = $wrapper->getUsername();
+        $wrapper->quit();
+        self::assertEquals("Ezequiel Q", $username);
     }
+
+//    public function test_loading_session()
+//    {
+//
+//        $wrapper = new WhatsappWrapper();
+//        $wrapper->start();
+//        $sessionData = WPPSession::first()->session;
+//        $wrapper->go_to("https://web.whatsapp.com");
+//        $wrapper->setSession($sessionData);
+//        self::assertTrue($wrapper->isLogged());
+//    }
 }

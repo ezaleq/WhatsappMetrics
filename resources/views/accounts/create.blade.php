@@ -58,6 +58,7 @@
                         data: {sessionId},
                         url: "/api/accounts/isLogged"
                     });
+                    window.location = "/accounts";
                     break;
                 }
                 catch {

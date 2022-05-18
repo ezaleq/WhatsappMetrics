@@ -7,7 +7,7 @@
             <h5 class="card-title">Lista de cuentas asociadas</h5>
             <p class="card-text">
                 Detalle de todas las cuentas asociadas
-                <div id="grid"></div>
+            <div id="grid"></div>
             </p>
         </div>
     </div>
@@ -21,26 +21,41 @@
         $(function () {
             loadGrid();
         });
+
         function loadGrid() {
             $("#grid").kendoGrid({
                 dataSource: {
+                    transport: {
+                        read: {
+                            url: "/api/accounts",
+                            type: "GET",
+                        },
+                        destroy: {
+                            url: "/api/accounts",
+                            type: "DELETE",
+                        },
+                        parameterMap: function (data, type) {
+                            if (type !== "read") {
+                                data._token = "{{csrf_token()}}";
+                            }
+                            return data;
+                        }
+                    },
                     schema: {
                         model: {
                             id: "id",
                             fields: {
-                                name: {type: "string"},
-                                phone: {type: "string"},
-                                account_type: {type: "string"},
+                                username: {type: "string"},
                             }
                         }
                     }
                 },
                 columns: [
-                    {field: "name", title: "Nombre"},
-                    {field: "phone", title: "Teléfono"},
-                    {field: "account_type", title: "Tipo de cuenta"}
+                    {field: "username", title: "Nombre de usuario"},
+                    {command: ["destroy"]}
                 ],
-                toolbar: [{name: "Create", text: "Crear", iconClass: "k-icon k-i-plus-outline"}, {name: "edit"}],
+                editable: "inline",
+                toolbar: [{name: "Create", text: "Crear", iconClass: "k-icon k-i-plus-outline"}],
                 sortable: true,
                 filterable: true
             });

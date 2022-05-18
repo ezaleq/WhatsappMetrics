@@ -26,5 +26,9 @@ Route::get("/accounts/create", function() {
 });
 
 
+Route::get("/api/accounts", [AccountsController::class, "getAccounts"]);
+Route::delete("/api/accounts", [AccountsController::class, "deleteAccount"]);
+
 Route::get("/api/accounts/qr", [AccountsController::class, "getQr"]);
 Route::get("/api/accounts/isLogged", [AccountsController::class, "isLogged"]);
+

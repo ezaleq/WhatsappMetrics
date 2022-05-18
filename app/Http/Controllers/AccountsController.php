@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AccountsService;
+use App\Models\WPPSession;
 use App\Services\WhatsappWrapper;
 use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeoutException;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use JetBrains\PhpStorm\ArrayShape;
 
 
@@ -41,12 +41,29 @@ class AccountsController extends Controller
         $wrapper->start();
         if ($wrapper->isLogged())
         {
-            $sessionData = $wrapper->getSession();
-
+            $wppSession = new WPPSession;
+            $wppSession->session = $wrapper->getSession();
+            $wppSession->username = $wrapper->getUsername();
+            $wppSession->save();
             $wrapper->quit();
             return true;
         }
         throw new Exception();
+    }
+
+    public function getAccounts(): Collection|\Illuminate\Support\Collection
+    {
+        return WPPSession::all()->map(function($wppAccount) {
+            return array(
+                "username" => $wppAccount->username,
+                "id" => $wppAccount->id);
+        });
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $id = $request->get("id");
+        WPPSession::where("id", $id)->delete();
     }
 
 }
