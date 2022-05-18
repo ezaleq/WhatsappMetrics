@@ -9,6 +9,7 @@ use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeoutException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use JetBrains\PhpStorm\ArrayShape;
 
 
@@ -22,12 +23,11 @@ class AccountsController extends Controller
     #[ArrayShape(["image" => "string", "sessionId" => "string"])] public function getQr(Request $request): array
     {
         $wrapper = new WhatsappWrapper();
-        $sessionId = $wrapper->start();
+        $data = $wrapper->start();
         $wrapper->go_to("https://web.whatsapp.com/");
         $qrImage = $wrapper->get_qr_login();
-        return array(
-            "image" => $qrImage,
-            "sessionId" => $sessionId);
+        $data["image"] = $qrImage;
+        return $data;
     }
 
     /**
@@ -36,13 +36,13 @@ class AccountsController extends Controller
     public function isLogged(Request $request): bool
     {
         $sessionId = $request->get("sessionId");
-        echo $sessionId;
-        $wrapper = New WhatsappWrapper($sessionId);
+        $foldername = $request->get("foldername");
+        $wrapper = New WhatsappWrapper($sessionId, $foldername);
         $wrapper->start();
         if ($wrapper->isLogged())
         {
             $wppSession = new WPPSession;
-            $wppSession->session = $wrapper->getSession();
+            $wppSession->foldername = $foldername;
             $wppSession->username = $wrapper->getUsername();
             $wppSession->save();
             $wrapper->quit();
@@ -63,7 +63,9 @@ class AccountsController extends Controller
     public function deleteAccount(Request $request)
     {
         $id = $request->get("id");
-        WPPSession::where("id", $id)->delete();
+        $wppSession = WPPSession::first("id", $id);
+        Storage::deleteDirectory("sessions\\" . $wppSession->foldername);
+        $wppSession->delete();
     }
 
 }

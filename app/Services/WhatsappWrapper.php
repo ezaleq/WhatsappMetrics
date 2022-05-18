@@ -14,6 +14,7 @@ use Facebook\WebDriver\WebDriverBy as By;
 use Facebook\WebDriver\WebDriverExpectedCondition as EC;
 use Facebook\WebDriver\WebDriverWait;
 use Illuminate\Support\Str;
+use JetBrains\PhpStorm\ArrayShape;
 
 class WhatsappWrapper
 {
@@ -21,7 +22,7 @@ class WhatsappWrapper
     protected ?string $sessionId = null;
     protected string $folder;
 
-    public function __construct($sessionId = null, $folder = null)
+    public function __construct($sessionId = null, string $folder = null)
     {
         $this->sessionId = $sessionId;
         if (empty($folder))
@@ -34,20 +35,22 @@ class WhatsappWrapper
         }
     }
 
-    public function start(): string
+    #[ArrayShape(["sessionId" => "string", "foldername" => "string"])] public function start(): array
     {
         if (empty($this->sessionId)) {
             $capabilities = DesiredCapabilities::chrome();
             $options = new ChromeOptions();
-            $storagePath = storage_path("app/sessions/Ezequiel Q/");
-
+            $storagePath = storage_path("sessions\\" . $this->folder);
             $options->addArguments(["--user-data-dir=" . $storagePath]);
             $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
             $this->driver = RemoteWebDriver::create("http://localhost:4444", $capabilities );
         } else {
             $this->driver = RemoteWebDriver::createBySessionID($this->sessionId, "http://localhost:4444");
         }
-        return $this->driver->getSessionID();
+        return array(
+            "sessionId" => $this->driver->getSessionID(),
+            "foldername" => $this->folder
+        );
     }
 
     public function go_to($url): void
@@ -99,62 +102,9 @@ class WhatsappWrapper
         return $userNameContainer->getText();
     }
 
-    public function getSession(): string
+    public function getFoldername() : string
     {
-        return $this->driver->executeScript("
-            function getResultFromRequest(request) {
-                return new Promise((resolve, reject) => {
-                    request.onsuccess = function (event) {
-                        resolve(request.result);
-                    };
-                });
-            }
-
-            async function getDB() {
-                var request = window.indexedDB.open('wawc');
-                return await getResultFromRequest(request);
-            }
-
-            async function readAllKeyValuePairs() {
-                var db = await getDB();
-                var objectStore = db.transaction('user').objectStore('user');
-                var request = objectStore.getAll();
-                   return await getResultFromRequest(request);
-            }
-
-            var session = await readAllKeyValuePairs();
-            return JSON.stringify(session);
-        ");
-    }
-
-    public function setSession($sessionString) : void
-    {
-        $this->driver->executeScript("
-            function getResultFromRequest(request) {
-                return new Promise((resolve, reject) => {
-                    request.onsuccess = function(event) {
-                        resolve(request.result);
-                    };
-                })
-            }
-
-            async function getDB() {
-                var request = window.indexedDB.open('wawc');
-                return await getResultFromRequest(request);
-            }
-
-            async function injectSession(SESSION_STRING) {
-                var session = JSON.parse(SESSION_STRING);
-                console.log(session);
-                var db = await getDB();
-                var objectStore = db.transaction('user', 'readwrite').objectStore('user');
-                for(var keyValue of session) {
-                    var request = objectStore.put(keyValue);
-                    await getResultFromRequest(request);
-                }
-            }
-            await injectSession(arguments[0]);
-        ", [$sessionString]);
+        return $this->folder;
     }
 
     public function quit()

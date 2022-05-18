@@ -41,7 +41,7 @@
                         ctx.drawImage(image, 0, 0);
                     }
                     image.src= "data:image/png;base64" + data.image;
-                    checkIfSign(data.sessionId);
+                    checkIfSign(data);
                 },
                 error: (data) => {
                     console.log(data);
@@ -50,12 +50,12 @@
             })
         }
 
-        async function checkIfSign(sessionId) {
+        async function checkIfSign(data) {
             while (true) {
                 try {
                     await $.ajax({
                         type: "GET",
-                        data: {sessionId},
+                        data: {"sessionId": data.sessionId, "foldername": data.foldername },
                         url: "/api/accounts/isLogged"
                     });
                     window.location = "/accounts";

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('WPPSessions', function (Blueprint $table) {
             $table->id();
             $table->string("username");
-            $table->text("session");
+            $table->string("foldername");
             $table->timestamps();
         });
     }
