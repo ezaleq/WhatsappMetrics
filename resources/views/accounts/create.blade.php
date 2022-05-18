@@ -5,7 +5,7 @@
     <div class="card">
         <div class="card-body text-center">
             <h3 class="card-title">
-                <i class="bi bi-phone"></i>
+                <i class="fa fa-mobile"></i>
                 Agendar nuevo teléfono
             </h3>
             <div id="loading">

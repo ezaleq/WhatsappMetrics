@@ -6,8 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield("title")</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" integrity="sha512-Oy+sz5W86PK0ZIkawrG0iv7XwWhYecM3exvUtMKNJMekGFJtVAhibhRPTpmyTj8+lJCkmWfnpxKgT2OopquBHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" rel="stylesheet" href="{{ mix('css/app.css') }}">
     <link rel="stylesheet" href="{{ URL::asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ URL::asset('css/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="{{ URL::asset('css/kendo.common.min.css') }}">
@@ -21,11 +20,11 @@
 <body>
     <x-navbar>
         <x-navbar_item href="/">
-            <i class="bi bi-speedometer"></i>
+            <i class="fa fa-line-chart"></i>
             Tablero
         </x-navbar_item>
         <x-navbar_item href="/accounts">
-            <i class="bi bi-whatsapp"></i>
+            <i class="fa fa-whatsapp"></i>
             Cuentas
         </x-navbar_item>
     </x-navbar>
