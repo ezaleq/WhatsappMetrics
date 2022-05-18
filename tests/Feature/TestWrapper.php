@@ -22,7 +22,7 @@ class TestWrapper extends TestCase
     {
         $wrapper = new WhatsappWrapper();
         $session_id = $wrapper->start();
-        $wrapper->go_to("https://web.whatsapp.com/");
+        $wrapper->goTo("https://web.whatsapp.com/");
         return $session_id;
     }
 
@@ -53,13 +53,30 @@ class TestWrapper extends TestCase
 //        self::assertEquals("Ezequiel Q", $username);
 //    }
 
-    public function test_loading_session()
-    {
+//
 
+    /**
+     * @throws NoSuchElementException
+     * @throws TimeoutException
+     */
+    public function test_getting_messages()
+    {
         $foldername = WPPSession::first()->foldername;
         $wrapper = new WhatsappWrapper(folder: $foldername);
         $wrapper->start();
-        $wrapper->go_to("https://web.whatsapp.com");
-        self::assertTrue($wrapper->isLogged());
+        try {
+            $wrapper->goTo("https://web.whatsapp.com");
+            while(!$wrapper->isLogged()){}
+            $chatElement = $wrapper->getChatByName("Bot");
+            $messages = $wrapper->getMessagesFromChat($chatElement);
+            error_log($messages);
+            $wrapper->quit();
+            self::assertTrue(true);
+
+        }
+        catch(\Exception $e) {
+            $wrapper->quit();
+            self::assertTrue(false,$e->getMessage());
+        }
     }
 }

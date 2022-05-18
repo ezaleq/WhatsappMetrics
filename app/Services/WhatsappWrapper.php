@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Facebook\WebDriver\Chrome\ChromeDriver;
 use Facebook\WebDriver\Chrome\ChromeDriverService;
 use Facebook\WebDriver\Chrome\ChromeOptions;
@@ -10,6 +11,7 @@ use Facebook\WebDriver\Exception\TimeoutException;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
+use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy as By;
 use Facebook\WebDriver\WebDriverExpectedCondition as EC;
 use Facebook\WebDriver\WebDriverWait;
@@ -53,7 +55,7 @@ class WhatsappWrapper
         );
     }
 
-    public function go_to($url): void
+    public function goTo($url): void
     {
         $this->driver->get($url);
     }
@@ -62,7 +64,7 @@ class WhatsappWrapper
      * @throws NoSuchElementException
      * @throws TimeoutException
      */
-    public function get_qr_login(): string
+    public function getQrLogin(): string
     {
         $waiter = new WebDriverWait($this->driver, 60);
         $canvas_qr = $waiter->until(EC::presenceOfElementLocated(By::cssSelector("canvas[aria-label='Scan me!']")));
@@ -105,6 +107,85 @@ class WhatsappWrapper
     public function getFoldername() : string
     {
         return $this->folder;
+    }
+
+    protected function getChatName(RemoteWebElement $chatElement) : string
+    {
+        $titleSpan = $chatElement->findElement(By::cssSelector(
+            "div > div > div._3OvU8 > div._3vPI2 > div > span[dir='auto']"));
+        return $titleSpan->getText();
+    }
+
+    /**
+     * @throws NoSuchElementException
+     * @throws TimeoutException
+     */
+    public function getChatByName(string $chatName) : RemoteWebElement
+    {
+        /**
+         * @var $chatElements RemoteWebElement[]
+         * @var $searchBox RemoteWebElement
+         */
+        $waiter = new WebDriverWait($this->driver, 20);
+        $searchBox = $waiter->until(EC::presenceOfElementLocated(By::cssSelector("div[role='textbox'][class*='_13NKt copyable-text selectable-text']")));
+        $searchBox->sendKeys($chatName);
+        $chatElements = $waiter->until(EC::presenceOfAllElementsLocatedBy(By::cssSelector("div._3m_Xw")));
+        foreach ($chatElements as $chatElement)
+        {
+            try
+            {
+                $chatElement->findElement(By::cssSelector("span[title='" . $chatName . "']"));
+                return $chatElement;
+            }
+            catch (Exception) { continue; }
+        }
+        throw new NoSuchElementException("No se encontraron chats con el nombre especificado");
+    }
+
+    public function getMessagesFromChat(RemoteWebElement $chatElement) : string
+    {
+        /** @var $messageElements RemoteWebElement[] */
+        $chatElement->click();
+
+        $chatView = $this->driver->findElement(By::cssSelector("div._2gzeB"));
+        $waiter = new WebDriverWait($this->driver, 10);
+        $messageElements = $waiter->until(EC::presenceOfAllElementsLocatedBy(By::cssSelector("div[class*='message-'][class='focusable-list-item']")));
+        $firstMessage = $messageElements[0]->getText();
+        return $firstMessage;
+    }
+
+    protected function parseMessages(string $rawMessages) : array
+    {
+        return array();
+    }
+
+    public function getMessages(): array
+    {
+        /**
+         * @var $chatList RemoteWebElement
+         * @var $chatElements RemoteWebElement[]
+         */
+        $scannedChats = array();
+        $waiter = new WebDriverWait($this->driver, 10);
+        $chatList = $waiter->until(EC::presenceOfElementLocated(By::cssSelector("div[aria-label='Chat list']")));
+        $totalChats = $chatList->getAttribute("rowcount");
+
+        while (count($totalChats) != $totalChats) {
+
+            $chatElements = $waiter->until(EC::presenceOfAllElementsLocatedBy(By::cssSelector("div._3m_Xw")));
+            foreach ($chatElements as $chatElement)
+            {
+                $chatName = $this->getChatName($chatElement);
+                if (in_array($chatName, $totalChats))
+                {
+                  continue;
+                }
+                $messages = $this->getMessagesFromChat($chatElement);
+                $parsed = $this->parseMessages($messages);
+                $totalChats[] = $chatName;
+            }
+        }
+        return array();
     }
 
     public function quit()

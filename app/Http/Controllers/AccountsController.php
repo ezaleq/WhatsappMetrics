@@ -24,8 +24,8 @@ class AccountsController extends Controller
     {
         $wrapper = new WhatsappWrapper();
         $data = $wrapper->start();
-        $wrapper->go_to("https://web.whatsapp.com/");
-        $qrImage = $wrapper->get_qr_login();
+        $wrapper->goTo("https://web.whatsapp.com/");
+        $qrImage = $wrapper->getQrLogin();
         $data["image"] = $qrImage;
         return $data;
     }
